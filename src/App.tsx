@@ -1,11 +1,11 @@
 import "./App.css";
-import Header from "./Header";
+import MainBoardComp from "./Components/BoardComponents/MainBoardComp";
 
 function App() {
   return (
-    <>
-      <h1 className="">Hello world!</h1>
-    </>
+    <div className="bg-[#21212d]">
+      <MainBoardComp />
+    </div>
   );
 }
 
