@@ -36,7 +36,7 @@ function Header() {
   return (
     <>
       <nav>
-        <div className="flex bg-red-300 items-center justify-between py-2 px-4">
+        <div className="flex bg-[#2c2c38] items-center justify-between py-2 px-4">
           <div className="flex gap-2">
             <div>
               <img src={logo} />
@@ -55,7 +55,7 @@ function Header() {
               setIsAddTaskOpen(true);
             }}
           >
-            <img src={addTask} className="bg-blue-700 px-5 py-3 rounded-3xl" />
+            <img src={addTask} className="bg-[#645fc6] px-5 py-3 rounded-3xl" />
             <img src={elipsis} />
           </div>
         </div>

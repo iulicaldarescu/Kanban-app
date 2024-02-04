@@ -20,8 +20,6 @@ function AddTask() {
 
   const deleteInput = (param: string) => {
     const updatedInputs = numberOfSubTasksInputs.filter((item) => {
-      console.log(param);
-
       return item.id !== param;
     });
 
@@ -33,7 +31,7 @@ function AddTask() {
   };
 
   return (
-    <form className="text-white bg-blue-950 px-6 h-screen">
+    <form className="text-white bg-[#2c2c38] px-6 h-screen flex flex-col gap-6">
       {/* tasks */}
       <h1>Add New Task</h1>
 
@@ -42,7 +40,7 @@ function AddTask() {
         <input
           id="title"
           placeholder="Take coffe break"
-          className="w-full bg-blue-950 border border-gray-300 px-3"
+          className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
         ></input>
       </div>
 
@@ -51,7 +49,7 @@ function AddTask() {
         <textarea
           id="description"
           placeholder="It's always good to take a break. This 15 minutes break will recharge the batteries a little."
-          className="w-full bg-blue-950 border border-gray-300 px-3 resize-none h-28"
+          className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded h-28"
         ></textarea>
       </div>
 
@@ -59,26 +57,28 @@ function AddTask() {
       <div>
         <p>Subtasks</p>
 
-        {numberOfSubTasksInputs.map((subTaskInput, index) => {
-          return (
-            <div className="flex gap-3" key={subTaskInput.id}>
-              <input
-                className="w-full bg-blue-950 border border-gray-300 px-3"
-                placeholder={subTaskInput.taskName}
-              ></input>
-              <button className="cursor-pointer">
-                <img
-                  src={cross}
-                  onClick={() => deleteInput(subTaskInput.id)}
-                ></img>
-              </button>
-            </div>
-          );
-        })}
+        <div className="flex flex-col gap-3">
+          {numberOfSubTasksInputs.map((subTaskInput, index) => {
+            return (
+              <div className="flex gap-3" key={subTaskInput.id}>
+                <input
+                  className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
+                  placeholder={subTaskInput.taskName}
+                ></input>
+                <button className="cursor-pointer">
+                  <img
+                    src={cross}
+                    onClick={() => deleteInput(subTaskInput.id)}
+                  ></img>
+                </button>
+              </div>
+            );
+          })}
+        </div>
 
         <div>
           <button
-            className="bg-white text-blue-800 w-full rounded-xl py-1"
+            className="bg-white text-[#645fc6] font-semibold w-full rounded-xl py-1 mt-6"
             onClick={addAnotherSubTask}
           >
             + Add new subtask
@@ -102,7 +102,7 @@ function AddTask() {
         {isStatusOpen && (
           <ul
             id="status"
-            className={`text-gray-100 bg-blue-950 border border-gray-300 p-1 outline-none`}
+            className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
           >
             <li value="todo" className="hover:bg-red-600">
               Todo
@@ -117,7 +117,7 @@ function AddTask() {
         )}
       </div>
       <div>
-        <button className="bg-white text-blue-800 w-full rounded-xl py-1">
+        <button className="bg-[#645fc6] text-white w-full rounded-xl py-1">
           Create Task
         </button>
       </div>
