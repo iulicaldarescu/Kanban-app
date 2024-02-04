@@ -1,12 +1,12 @@
-import logo from "./assets/logo-mobile.svg";
-import arrowUp from "./assets/icon-chevron-up.svg";
-import arrowDown from "./assets/icon-chevron-down.svg";
-import addTask from "./assets/icon-add-task-mobile.svg";
-import elipsis from "./assets/icon-vertical-ellipsis.svg";
+import logo from "../../assets/logo-mobile.svg";
+import arrowUp from "../../assets/icon-chevron-up.svg";
+import arrowDown from "../../assets/icon-chevron-down.svg";
+import addTask from "../../assets/icon-add-task-mobile.svg";
+import elipsis from "../../assets/icon-vertical-ellipsis.svg";
 import { useEffect, useState } from "react";
-import fetchData from "./FetchFunctions/FetchData.js";
+import fetchData from "../../FetchFunctions/FetchData.js";
 import { useQuery } from "@tanstack/react-query";
-import AddTask from "./AddTask.js";
+import AddTask from "../../AddTask.js";
 
 type BoardType = {
   id: string;
