@@ -1,13 +1,15 @@
 import { useState } from "react";
-import cross from "./assets/icon-cross.svg";
+import cross from "../../assets/icon-cross.svg";
 import { v4 as uuidv4 } from "uuid";
-import styles from "./styles/AddTask.module.css";
+import arrowUp from "../../assets/icon-chevron-up.svg";
+import arrowDown from "../../assets/icon-chevron-down.svg";
 
 function AddTask() {
   const [numberOfSubTasksInputs, setNumberOfSubTasksInputs] = useState([
     { id: uuidv4(), taskName: "Make coffe" },
     { id: uuidv4(), taskName: "Smile" },
   ]);
+  const [isStatusOpen, setIsStatusOpen] = useState(true);
 
   const addAnotherSubTask = () => {
     setNumberOfSubTasksInputs([
@@ -26,8 +28,12 @@ function AddTask() {
     setNumberOfSubTasksInputs(updatedInputs);
   };
 
+  const showStatusValues = () => {
+    setIsStatusOpen(!setIsStatusOpen);
+  };
+
   return (
-    <div className="text-white bg-blue-950 px-6 h-screen">
+    <form className="text-white bg-blue-950 px-6 h-screen">
       {/* tasks */}
       <h1>Add New Task</h1>
 
@@ -45,7 +51,7 @@ function AddTask() {
         <textarea
           id="description"
           placeholder="It's always good to take a break. This 15 minutes break will recharge the batteries a little."
-          className="w-full bg-blue-950 border border-gray-300 px-3"
+          className="w-full bg-blue-950 border border-gray-300 px-3 resize-none h-28"
         ></textarea>
       </div>
 
@@ -82,19 +88,40 @@ function AddTask() {
 
       {/* status */}
       <div className="flex flex-col">
-        <label htmlFor="status">Status</label>
-        <select
-          id="status"
-          className={`text-gray-100 bg-blue-950 border border-gray-300 p-1 outline-none ${styles["custom-select"]}`}
-        >
-          <option value={"todo"} className="">
-            Todo
-          </option>
-          <option value={"doing"}>Doing</option>
-          <option value={"done"}>Done</option>
-        </select>
+        <div className="flex items-center gap-1">
+          <p>Status</p>
+          <div onClick={() => setIsStatusOpen((prev) => !prev)}>
+            {isStatusOpen ? (
+              <img src={arrowDown}></img>
+            ) : (
+              <img src={arrowUp}></img>
+            )}
+          </div>
+        </div>
+
+        {isStatusOpen && (
+          <ul
+            id="status"
+            className={`text-gray-100 bg-blue-950 border border-gray-300 p-1 outline-none`}
+          >
+            <li value="todo" className="hover:bg-red-600">
+              Todo
+            </li>
+            <li value="doing" className="hover:bg-red-600">
+              Doing
+            </li>
+            <li value="done" className="hover:bg-red-600">
+              Done
+            </li>
+          </ul>
+        )}
       </div>
-    </div>
+      <div>
+        <button className="bg-white text-blue-800 w-full rounded-xl py-1">
+          Create Task
+        </button>
+      </div>
+    </form>
   );
 }
 

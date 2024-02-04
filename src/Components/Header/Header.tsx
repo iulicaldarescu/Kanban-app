@@ -6,7 +6,7 @@ import elipsis from "../../assets/icon-vertical-ellipsis.svg";
 import { useEffect, useState } from "react";
 import fetchData from "../../FetchFunctions/FetchData.js";
 import { useQuery } from "@tanstack/react-query";
-import AddTask from "../../AddTask.js";
+import AddTask from "../AddTask/AddTask.js";
 
 type BoardType = {
   id: string;
