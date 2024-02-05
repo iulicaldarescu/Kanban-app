@@ -3,13 +3,21 @@ import cross from "../../assets/icon-cross.svg";
 import { v4 as uuidv4 } from "uuid";
 import arrowUp from "../../assets/icon-chevron-up.svg";
 import arrowDown from "../../assets/icon-chevron-down.svg";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-function AddTask() {
+type SetIsAddTaskOpen = (isOpen: boolean) => void;
+
+type SetIsAddTaskOpenType = {
+  setIsAddTaskOpen: SetIsAddTaskOpen;
+};
+function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
   const [numberOfSubTasksInputs, setNumberOfSubTasksInputs] = useState([
     { id: uuidv4(), taskName: "Make coffe" },
     { id: uuidv4(), taskName: "Smile" },
   ]);
-  const [isStatusOpen, setIsStatusOpen] = useState(true);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
 
   const addAnotherSubTask = () => {
     setNumberOfSubTasksInputs([
@@ -26,22 +34,45 @@ function AddTask() {
     setNumberOfSubTasksInputs(updatedInputs);
   };
 
-  const showStatusValues = () => {
-    setIsStatusOpen(!setIsStatusOpen);
+  const schema = yup.object().shape({
+    title: yup.string().required("title is required"),
+    description: yup.string(),
+    subTasks: yup.array().of(yup.string()),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = (data) => {
+    console.log(data);
   };
 
   return (
-    <form className="text-white bg-[#2c2c38] px-6 h-screen flex flex-col gap-6">
+    <form
+      className="absolute top-0 right-0 left-0 text-white bg-[#2c2c38] px-6 h-screen flex flex-col gap-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       {/* tasks */}
-      <h1>Add New Task</h1>
+      <div className="flex justify-between pt-4 items-center">
+        <h1>Add New Task</h1>
+        <img src={cross} onClick={() => setIsAddTaskOpen(false)}></img>
+      </div>
 
       <div>
         <label htmlFor="title">Title</label>
         <input
           id="title"
+          type="text"
           placeholder="Take coffe break"
           className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
+          {...register("title")}
         ></input>
+        <p className="text-red-500 px-2">{errors.title?.message}</p>
       </div>
 
       <div>
@@ -50,6 +81,7 @@ function AddTask() {
           id="description"
           placeholder="It's always good to take a break. This 15 minutes break will recharge the batteries a little."
           className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded h-28"
+          {...register("description")}
         ></textarea>
       </div>
 
@@ -62,8 +94,10 @@ function AddTask() {
             return (
               <div className="flex gap-3" key={subTaskInput.id}>
                 <input
+                  type="text"
                   className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
                   placeholder={subTaskInput.taskName}
+                  {...register(`subTasks.${index}`)}
                 ></input>
                 <button className="cursor-pointer">
                   <img

@@ -71,7 +71,7 @@ function Header() {
         )}
       </nav>
 
-      {isAddTaskOpen && <AddTask />}
+      {isAddTaskOpen && <AddTask setIsAddTaskOpen={setIsAddTaskOpen} />}
     </>
   );
 }
