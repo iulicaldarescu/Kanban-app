@@ -18,6 +18,7 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
     { id: uuidv4(), taskName: "Smile" },
   ]);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [getStatusValue, setGetStatusValue] = useState("Todo");
 
   const addAnotherSubTask = () => {
     setNumberOfSubTasksInputs([
@@ -37,7 +38,7 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
   const schema = yup.object().shape({
     title: yup.string().required("title is required"),
     description: yup.string(),
-    subTasks: yup.array().of(yup.string()),
+    subtasks: yup.array().of(yup.string()),
   });
 
   const {
@@ -48,8 +49,24 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
+    const newTask = {
+      name: getStatusValue,
+      tasks: [
+        {
+          title: data.title,
+          description: data.description,
+          status: getStatusValue,
+          subtasks: data.subtasks.map((subtask: any) => ({
+            title: subtask,
+            isCompleted: false,
+          })),
+        },
+      ],
+    };
+
     console.log(data);
+    console.log(newTask);
   };
 
   return (
@@ -97,8 +114,9 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
                   type="text"
                   className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
                   placeholder={subTaskInput.taskName}
-                  {...register(`subTasks.${index}`)}
+                  {...register(`subtasks.${index}`)}
                 ></input>
+
                 <button className="cursor-pointer">
                   <img
                     src={cross}
@@ -138,13 +156,25 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
             id="status"
             className="w-full border-2 bg-[#2c2c38] border-[#45455e] px-3 focus:outline-none rounded"
           >
-            <li value="todo" className="hover:bg-red-600">
+            <li
+              value="todo"
+              className="hover:bg-red-600"
+              onClick={() => setGetStatusValue("Todo")}
+            >
               Todo
             </li>
-            <li value="doing" className="hover:bg-red-600">
+            <li
+              value="doing"
+              className="hover:bg-red-600"
+              onClick={() => setGetStatusValue("Doing")}
+            >
               Doing
             </li>
-            <li value="done" className="hover:bg-red-600">
+            <li
+              value="done"
+              className="hover:bg-red-600"
+              onClick={() => setGetStatusValue("Done")}
+            >
               Done
             </li>
           </ul>
