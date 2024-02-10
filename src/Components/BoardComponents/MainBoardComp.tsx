@@ -1,13 +1,16 @@
 import ColumnList from "./ColumnList";
-import fetchData from "../../FetchFunctions/FetchData.js";
+import fetchMainBoard from "../../FetchFunctions/fetchMainBoard";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import useBoardStore from "../../store/board.ts";
 
 // This is a component which represents the one project board
 function MainBoardComp() {
+  const { board } = useBoardStore();
+
   const { data, isLoading } = useQuery({
-    queryKey: ["boards"],
-    queryFn: fetchData,
+    queryKey: [`main-boards ${board}`],
+    queryFn: () => fetchMainBoard(board),
   });
 
   useEffect(() => {

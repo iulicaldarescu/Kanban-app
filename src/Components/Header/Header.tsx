@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import fetchData from "../../FetchFunctions/FetchData.js";
 import { useQuery } from "@tanstack/react-query";
 import AddTask from "../AddTask/AddTask.js";
+import useBoardStore from "../../store/board.js";
 
 type BoardType = {
   id: string;
@@ -28,6 +29,12 @@ function Header() {
       console.log(data);
     }
   }, []);
+
+  const { board, setBoard } = useBoardStore();
+
+  useEffect(() => {
+    console.log(board);
+  }, [board]);
 
   if (isLoading) {
     return <p>LOADING ...</p>;
@@ -64,7 +71,14 @@ function Header() {
           <div className="bg-blue-300  w-1/2 m-2 p-2">
             <ul>
               {data.map((board: BoardType) => {
-                return <li className="text-white border-b-2">{board.name}</li>;
+                return (
+                  <li
+                    className="text-white border-b-2"
+                    onClick={() => setBoard(board.id)}
+                  >
+                    {board.name}
+                  </li>
+                );
               })}
             </ul>
           </div>
