@@ -1,13 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Tasks from "./Tasks";
 
 // This is a component which represents the list with all columns per Board project
 function ColumnList({ listsArray }) {
   const [showList, setShowList] = useState<boolean>(false);
-
-  useEffect(() => {
-    console.log(listsArray);
-  }, []);
 
   // LIST COLOR SETTER
   const getRandomValueInRange = (min: number, max: number) =>

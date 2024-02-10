@@ -7,8 +7,6 @@ const fetchMainBoard = async (param) => {
       .select()
       .eq("id", param);
 
-    console.log(data);
-
     return data;
   } catch (error) {
     console.error(error);

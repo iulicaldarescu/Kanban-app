@@ -1,14 +1,32 @@
+import cross from "../../../assets/icon-cross.svg";
+
 function TaskInfoModal({ taskInfos, setEditTask }) {
   const handleTask = () => {
     setEditTask(false);
   };
-  console.log(taskInfos);
+
+  // count how many tasks are completed
+  const completed = taskInfos.subtasks.reduce((acc, curr) => {
+    return acc + curr.isCompleted;
+  }, 0);
+
+  // this function modify the status of the task , but the status is taken from db so is not able to change direclty , it has to be updated in db , then is displayed in GUI
+  const handleSubtask = (e) => {
+    console.log(e);
+  };
+
   return (
     <form className="bg-[#2c2c38] text-white absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-3">
-      <p onClick={handleTask}>X</p>
-
-      {/* task title */}
-      <p className="font-bold text-xl">{taskInfos.title}</p>
+      {/* top container */}
+      <div className="flex items-center justify-between">
+        {/* task title */}
+        <p className="font-bold text-xl">{taskInfos.title}</p>
+        <img
+          className="h-[15px] w-[15px]"
+          onClick={handleTask}
+          src={cross}
+        ></img>
+      </div>
 
       {/* task description */}
       <p className="text-[#808189] font-semibold">{taskInfos.description}</p>
@@ -17,12 +35,16 @@ function TaskInfoModal({ taskInfos, setEditTask }) {
       <ul className="flex flex-col gap-3">
         <p className="font-semibold">
           {" "}
-          Subtotals (X of {taskInfos.subtasks.length})
+          Subtasks ({completed} of {taskInfos.subtasks.length})
         </p>
         {taskInfos.subtasks.map((subtask) => {
           return (
             <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
-              <input type="checkbox" checked={subtask.isCompleted}></input>
+              <input
+                onChange={handleSubtask}
+                type="checkbox"
+                checked={subtask.isCompleted}
+              ></input>
               <p
                 className={`${
                   subtask.isCompleted ? "line-through text-[#808189]" : ""

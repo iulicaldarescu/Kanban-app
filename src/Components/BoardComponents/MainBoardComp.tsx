@@ -6,16 +6,16 @@ import useBoardStore from "../../store/board.ts";
 
 // This is a component which represents the one project board
 function MainBoardComp() {
-  const { board } = useBoardStore();
+  const { boardID } = useBoardStore();
 
   const { data, isLoading } = useQuery({
-    queryKey: [`main-boards ${board}`],
-    queryFn: () => fetchMainBoard(board),
+    queryKey: [`main-boards ${boardID}`],
+    queryFn: () => fetchMainBoard(boardID),
   });
 
   useEffect(() => {
     if (data) {
-      console.log(data[0]);
+      // console.log(data[0]);
     }
   }, [data]);
 

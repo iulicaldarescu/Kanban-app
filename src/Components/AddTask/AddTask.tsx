@@ -158,21 +158,21 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
           >
             <li
               value="todo"
-              className="hover:bg-red-600"
+              className="hover:bg-[#21212d] pl-4 rounded"
               onClick={() => setGetStatusValue("Todo")}
             >
               Todo
             </li>
             <li
               value="doing"
-              className="hover:bg-red-600"
+              className="hover:bg-[#21212d] pl-4 rounded"
               onClick={() => setGetStatusValue("Doing")}
             >
               Doing
             </li>
             <li
               value="done"
-              className="hover:bg-red-600"
+              className="hover:bg-[#21212d] pl-4 rounded"
               onClick={() => setGetStatusValue("Done")}
             >
               Done
