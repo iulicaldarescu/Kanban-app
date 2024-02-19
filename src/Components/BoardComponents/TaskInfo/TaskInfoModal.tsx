@@ -1,18 +1,35 @@
+import { useState } from "react";
 import cross from "../../../assets/icon-cross.svg";
+import SubtaskType from "../TaskInfo/types";
 
-function TaskInfoModal({ taskInfos, setEditTask }) {
+function TaskInfoModal({ taskInfos, setEditTask }: any) {
   const handleTask = () => {
     setEditTask(false);
   };
 
   // count how many tasks are completed
-  const completed = taskInfos.subtasks.reduce((acc, curr) => {
-    return acc + curr.isCompleted;
-  }, 0);
+  const completed = taskInfos.subtasks.reduce(
+    (acc: number, curr: SubtaskType) => {
+      return acc + curr.isCompleted;
+    },
+    0
+  );
+
+  const changeStatus = (value: boolean, name: string) => {
+    console.log(name, value);
+    const newSubtasksArr = taskInfos.subtasks.map((subtask: SubtaskType) => {
+      if (subtask.title === name) {
+        subtask.isCompleted = value;
+      }
+      return subtask;
+    });
+    // Further we have to update in supabse this belowArr
+    console.log(newSubtasksArr);
+  };
 
   // this function modify the status of the task , but the status is taken from db so is not able to change direclty , it has to be updated in db , then is displayed in GUI
-  const handleSubtask = (e) => {
-    console.log(e);
+  const handleSubtask = (e: any) => {
+    changeStatus(e.target.checked, e.target.name);
   };
 
   return (
@@ -37,13 +54,14 @@ function TaskInfoModal({ taskInfos, setEditTask }) {
           {" "}
           Subtasks ({completed} of {taskInfos.subtasks.length})
         </p>
-        {taskInfos.subtasks.map((subtask) => {
+        {taskInfos.subtasks.map((subtask: SubtaskType) => {
           return (
             <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
               <input
                 onChange={handleSubtask}
                 type="checkbox"
                 checked={subtask.isCompleted}
+                name={subtask.title}
               ></input>
               <p
                 className={`${
