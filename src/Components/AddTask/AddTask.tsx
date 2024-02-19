@@ -6,6 +6,8 @@ import arrowDown from "../../assets/icon-chevron-down.svg";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import supabase from "../../config/supabaseClient.js";
+import useBoardStore from "../../store/board";
 
 type SetIsAddTaskOpen = (isOpen: boolean) => void;
 
@@ -13,6 +15,9 @@ type SetIsAddTaskOpenType = {
   setIsAddTaskOpen: SetIsAddTaskOpen;
 };
 function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
+  // global state
+  const { boardID, boardName } = useBoardStore();
+
   const [numberOfSubTasksInputs, setNumberOfSubTasksInputs] = useState([
     { id: uuidv4(), taskName: "Make coffe" },
     { id: uuidv4(), taskName: "Smile" },
@@ -49,7 +54,7 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     const newTask = {
       name: getStatusValue,
       tasks: [
@@ -65,8 +70,30 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
       ],
     };
 
-    console.log(data);
-    console.log(newTask);
+    // console.log(data);
+    // console.log(newTask);
+    // console.log(boardName);
+
+    const { data: allData, error: err } = await supabase
+      .from("KanbanApp-Boards")
+      .select("columns")
+      .eq("id", boardID);
+
+    console.log(allData);
+
+    const newArr = allData[0].columns.map((item: any) => {
+      if (item.name === getStatusValue) {
+        const newTasksArr = [...item.tasks, newTask.tasks[0]];
+
+        return { ...item, tasks: newTasksArr };
+      }
+      return item;
+    });
+    console.log(newArr);
+    const { error } = await supabase
+      .from("KanbanApp-Boards")
+      .update({ columns: newArr })
+      .eq("id", boardID);
   };
 
   return (

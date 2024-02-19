@@ -3,6 +3,7 @@ import cross from "../../../assets/icon-cross.svg";
 import SubtaskType from "../TaskInfo/types";
 
 function TaskInfoModal({ taskInfos, setEditTask }: any) {
+  console.log(taskInfos);
   const handleTask = () => {
     setEditTask(false);
   };
