@@ -70,16 +70,10 @@ function AddTask({ setIsAddTaskOpen }: SetIsAddTaskOpenType) {
       ],
     };
 
-    // console.log(data);
-    // console.log(newTask);
-    // console.log(boardName);
-
     const { data: allData, error: err } = await supabase
       .from("KanbanApp-Boards")
       .select("columns")
       .eq("id", boardID);
-
-    console.log(allData);
 
     const newArr = allData[0].columns.map((item: any) => {
       if (item.name === getStatusValue) {

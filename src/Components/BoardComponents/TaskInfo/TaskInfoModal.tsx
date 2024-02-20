@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import cross from "../../../assets/icon-cross.svg";
 import SubtaskType from "../TaskInfo/types";
+import useBoardStore from "../../../store/board";
+import supabase from "../../../config/supabaseClient";
 
 function TaskInfoModal({ taskInfos, setEditTask }: any) {
-  console.log(taskInfos);
+  const { boardID } = useBoardStore();
+  const [boardListsArr, setBoardListsArr] = useState<any>([]);
+
   const handleTask = () => {
     setEditTask(false);
   };
@@ -32,6 +36,18 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
   const handleSubtask = (e: any) => {
     changeStatus(e.target.checked, e.target.name);
   };
+
+  const fetchSelectedBoard = async () => {
+    const { data: allData, error: err } = await supabase
+      .from("KanbanApp-Boards")
+      .select("columns")
+      .eq("id", boardID);
+    setBoardListsArr(allData[0].columns);
+  };
+
+  useEffect(() => {
+    fetchSelectedBoard();
+  }, [boardID]);
 
   return (
     <form className="bg-[#2c2c38] text-white absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-3">
@@ -81,15 +97,17 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
         name="status"
         className="bg-[#2c2c38] border border-[#45455e] rounded focus:outline-none"
       >
-        <option value="Todo" selected={taskInfos.status === "Todo"}>
-          Todo
-        </option>
-        <option value="Doing" selected={taskInfos.status === "Doing"}>
-          Doing
-        </option>
-        <option value="Done" selected={taskInfos.status === "Done"}>
-          Done
-        </option>
+        {boardListsArr.map((item: any) => {
+          return (
+            <option
+              className=""
+              value={item.name}
+              selected={taskInfos.status === item.name}
+            >
+              {item.name}
+            </option>
+          );
+        })}
       </select>
     </form>
   );
