@@ -3,10 +3,12 @@ import cross from "../../../assets/icon-cross.svg";
 import SubtaskType from "../TaskInfo/types";
 import useBoardStore from "../../../store/board";
 import supabase from "../../../config/supabaseClient";
+import { useForm } from "react-hook-form";
 
 function TaskInfoModal({ taskInfos, setEditTask }: any) {
   const { boardID } = useBoardStore();
   const [boardListsArr, setBoardListsArr] = useState<any>([]);
+  const [isEditable, setIsEditable] = useState<boolean>(false);
 
   const handleTask = () => {
     setEditTask(false);
@@ -49,21 +51,54 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
     fetchSelectedBoard();
   }, [boardID]);
 
+  // INPUT FORM DATA COLLECTION
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = () => {
+    console.log("SUBMITTED");
+  };
+
+  const changeEditMode = () => {
+    setIsEditable(true);
+  };
+
+  const changeEditModeFalse = () => {
+    setIsEditable(false);
+  };
+
   return (
-    <form className="bg-[#2c2c38] text-white absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-3">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-[#2c2c38] text-white absolute top-0 bottom-0 left-0 right-0 flex flex-col gap-3"
+    >
       {/* top container */}
       <div className="flex items-center justify-between">
         {/* task title */}
-        <p className="font-bold text-xl">{taskInfos.title}</p>
+        {isEditable ? (
+          <input
+            className="bg-transparent w-full font-bold text-xl focus:outline-none"
+            type="text"
+            value={taskInfos.title}
+          ></input>
+        ) : (
+          <p className="font-bold text-xl">{taskInfos.title}</p>
+        )}
+
         <img
           className="h-[15px] w-[15px]"
           onClick={handleTask}
           src={cross}
         ></img>
       </div>
-
       {/* task description */}
-      <p className="text-[#808189] font-semibold">{taskInfos.description}</p>
+      {!isEditable ? (
+        <p className="text-[#808189] font-semibold">{taskInfos.description}</p>
+      ) : (
+        <textarea
+          className="bg-transparent focus:outline-none"
+          value={taskInfos.description}
+        ></textarea>
+      )}
 
       {/* subtask array */}
       <ul className="flex flex-col gap-3">
@@ -72,7 +107,7 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
           Subtasks ({completed} of {taskInfos.subtasks.length})
         </p>
         {taskInfos.subtasks.map((subtask: SubtaskType) => {
-          return (
+          return !isEditable ? (
             <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
               <input
                 onChange={handleSubtask}
@@ -87,6 +122,21 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
               >
                 {subtask.title}
               </p>
+            </li>
+          ) : (
+            <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
+              {/* <input
+                onChange={handleSubtask}
+                type="checkbox"
+                checked={subtask.isCompleted}
+                name={subtask.title}
+              ></input> */}
+
+              <input
+                type="text"
+                className="bg-transparent focus:outline-none"
+                value={subtask.title}
+              ></input>
             </li>
           );
         })}
@@ -109,6 +159,33 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
           );
         })}
       </select>
+      <div className="w-full flex justify-around mt-10">
+        {!isEditable ? (
+          <button className="bg-rose-500 font-semibold py-1 w-24 rounded-full">
+            Delete
+          </button>
+        ) : (
+          <button className="bg-green-500 font-semibold py-1 w-24 rounded-full">
+            Confirm
+          </button>
+        )}
+        {!isEditable && (
+          <button
+            onClick={changeEditMode}
+            className="bg-green-500 font-semibold py-1 w-24 rounded-full"
+          >
+            Edit
+          </button>
+        )}
+        {isEditable && (
+          <button
+            onClick={changeEditModeFalse}
+            className="bg-rose-500 font-semibold py-1 w-24 rounded-full"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }
