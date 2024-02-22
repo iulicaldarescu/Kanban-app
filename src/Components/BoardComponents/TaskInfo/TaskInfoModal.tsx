@@ -22,6 +22,10 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
     0
   );
 
+  useEffect(() => {
+    console.log(taskInfos);
+  }, []);
+
   const changeStatus = (value: boolean, name: string) => {
     console.log(name, value);
     const newSubtasksArr = taskInfos.subtasks.map((subtask: SubtaskType) => {
@@ -64,6 +68,45 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
 
   const changeEditModeFalse = () => {
     setIsEditable(false);
+  };
+
+  // there were no id from fronendmentor for tasks so we do it by title name
+  const deleteTask = async (titleName: string) => {
+    //fetch
+
+    const { data, error } = await supabase
+      .from("KanbanApp-Boards")
+      .select("columns")
+      .eq("id", boardID);
+
+    console.log(data[0].columns);
+
+    const listName = data[0].columns.filter((item) => {
+      return item.name === taskInfos.status;
+    });
+
+    const deletingTask = listName.filter((task) => {
+      return task.title !== taskInfos.title;
+    });
+
+    console.log(deletingTask[0].tasks);
+    const newArr = deletingTask[0].tasks.filter((item) => {
+      return item.title !== titleName;
+    });
+    console.log(newArr);
+
+    const finalArray = data[0].columns.map((list) => {
+      if (list.name === taskInfos.status) {
+        list.tasks = [...newArr];
+      }
+      return list;
+    });
+    console.log(finalArray);
+
+    const { error: err } = await supabase
+      .from("KanbanApp-Boards")
+      .update({ columns: finalArray })
+      .eq("id", boardID);
   };
 
   return (
@@ -161,7 +204,10 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       </select>
       <div className="w-full flex justify-around mt-10">
         {!isEditable ? (
-          <button className="bg-rose-500 font-semibold py-1 w-24 rounded-full">
+          <button
+            className="bg-rose-500 font-semibold py-1 w-24 rounded-full"
+            onClick={() => deleteTask(taskInfos.title)}
+          >
             Delete
           </button>
         ) : (
