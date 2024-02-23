@@ -81,7 +81,9 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
     console.log(supaInfo[0].columns);
 
     let newArr = supaInfo[0].columns.map((item: any) => {
-      return item.name === updatedTaskInfo.status
+      return item.name === "Todo" ||
+        item.name === "Doing" ||
+        item.name === "Done"
         ? {
             ...item,
             tasks: item.tasks.filter((item: any) => {
@@ -97,8 +99,11 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
         : list;
     });
 
-    // further update in supabse
-    console.log(newArr);
+    // further step is to update in supabase the columns property of row object wit newArr whihc has format as columns array
+    const { error } = await supabase
+      .from("KanbanApp-Boards")
+      .update({ columns: newArr })
+      .eq("id", boardID);
   };
 
   const changeEditMode = () => {
