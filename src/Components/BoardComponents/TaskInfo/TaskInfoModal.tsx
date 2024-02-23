@@ -9,6 +9,7 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
   const { boardID } = useBoardStore();
   const [boardListsArr, setBoardListsArr] = useState<any>([]);
   const [isEditable, setIsEditable] = useState<boolean>(false);
+  const [editStatus, setEditStatus] = useState<string>("Todo");
 
   const handleTask = () => {
     setEditTask(false);
@@ -58,8 +59,46 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
   // INPUT FORM DATA COLLECTION
   const { register, handleSubmit } = useForm();
 
-  const onSubmit = () => {
-    console.log("SUBMITTED");
+  // this is database update logics
+  const onSubmit = async (data: any) => {
+    // Building the object
+    const updatedTaskInfo = {
+      title: data.title,
+      status: editStatus,
+
+      subtasks: data.subtask.map((itemSubtask: any) => {
+        return { title: itemSubtask, isCompleted: false };
+      }),
+      description: data.description,
+    };
+
+    // First fetch phase
+    const { data: supaInfo } = await supabase
+      .from("KanbanApp-Boards")
+      .select()
+      .eq("id", boardID);
+    console.log(data);
+    console.log(supaInfo[0].columns);
+
+    let newArr = supaInfo[0].columns.map((item: any) => {
+      return item.name === updatedTaskInfo.status
+        ? {
+            ...item,
+            tasks: item.tasks.filter((item: any) => {
+              return item.title !== updatedTaskInfo.title;
+            }),
+          }
+        : item;
+    });
+
+    newArr = newArr.map((list: any) => {
+      return list.name === updatedTaskInfo.status
+        ? { ...list, tasks: [...list.tasks, updatedTaskInfo] }
+        : list;
+    });
+
+    // further update in supabse
+    console.log(newArr);
   };
 
   const changeEditMode = () => {
@@ -81,27 +120,26 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
 
     console.log(data[0].columns);
 
-    const listName = data[0].columns.filter((item) => {
+    const listName = data[0].columns.filter((item: any) => {
       return item.name === taskInfos.status;
     });
 
-    const deletingTask = listName.filter((task) => {
+    const deletingTask = listName.filter((task: any) => {
       return task.title !== taskInfos.title;
     });
 
     console.log(deletingTask[0].tasks);
-    const newArr = deletingTask[0].tasks.filter((item) => {
+    const newArr = deletingTask[0].tasks.filter((item: any) => {
       return item.title !== titleName;
     });
     console.log(newArr);
 
-    const finalArray = data[0].columns.map((list) => {
+    const finalArray = data[0].columns.map((list: any) => {
       if (list.name === taskInfos.status) {
         list.tasks = [...newArr];
       }
       return list;
     });
-    console.log(finalArray);
 
     const { error: err } = await supabase
       .from("KanbanApp-Boards")
@@ -121,7 +159,8 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
           <input
             className="bg-transparent w-full font-bold text-xl focus:outline-none"
             type="text"
-            value={taskInfos.title}
+            defaultValue={taskInfos.title}
+            {...register("title")}
           ></input>
         ) : (
           <p className="font-bold text-xl">{taskInfos.title}</p>
@@ -139,7 +178,8 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       ) : (
         <textarea
           className="bg-transparent focus:outline-none"
-          value={taskInfos.description}
+          defaultValue={taskInfos.description}
+          {...register("description")}
         ></textarea>
       )}
 
@@ -149,7 +189,7 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
           {" "}
           Subtasks ({completed} of {taskInfos.subtasks.length})
         </p>
-        {taskInfos.subtasks.map((subtask: SubtaskType) => {
+        {taskInfos.subtasks.map((subtask: SubtaskType, index: number) => {
           return !isEditable ? (
             <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
               <input
@@ -175,11 +215,14 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
                 name={subtask.title}
               ></input> */}
 
-              <input
-                type="text"
-                className="bg-transparent focus:outline-none"
-                value={subtask.title}
-              ></input>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  className="bg-transparent focus:outline-none"
+                  defaultValue={subtask.title}
+                  {...register(`subtask.${index}`)}
+                ></input>
+              </div>
             </li>
           );
         })}
@@ -187,6 +230,9 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       {/* status */}
       <label htmlFor="status">Status</label>
       <select
+        onChange={(e) => {
+          setEditStatus(e.target.value);
+        }}
         name="status"
         className="bg-[#2c2c38] border border-[#45455e] rounded focus:outline-none"
       >
