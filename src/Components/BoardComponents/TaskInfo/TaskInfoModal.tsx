@@ -10,6 +10,8 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
   const [boardListsArr, setBoardListsArr] = useState<any>([]);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [editStatus, setEditStatus] = useState<string>("Todo");
+  const [isChecked, setIsChecked] = useState(false);
+  const [inputSubtask, setInputSubtask] = useState(false);
 
   const handleTask = () => {
     setEditTask(false);
@@ -23,12 +25,8 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
     0
   );
 
-  useEffect(() => {
-    console.log(taskInfos);
-  }, []);
-
   const changeStatus = (value: boolean, name: string) => {
-    console.log(name, value);
+    // console.log(name, value);
     const newSubtasksArr = taskInfos.subtasks.map((subtask: SubtaskType) => {
       if (subtask.title === name) {
         subtask.isCompleted = value;
@@ -36,12 +34,37 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       return subtask;
     });
     // Further we have to update in supabse this belowArr
-    console.log(newSubtasksArr);
+    return newSubtasksArr;
   };
 
   // this function modify the status of the task , but the status is taken from db so is not able to change direclty , it has to be updated in db , then is displayed in GUI
-  const handleSubtask = (e: any) => {
+  const handleSubtask = async (e: any, title: string) => {
     changeStatus(e.target.checked, e.target.name);
+    setIsChecked((prev) => !prev);
+    setInputSubtask(e.target.checked);
+  };
+
+  const confirm = async (title) => {
+    const boardListItem = boardListsArr.filter((board) => {
+      return board.name === taskInfos.status;
+    });
+
+    const boardListTasks = boardListItem[0].tasks.map((item) => {
+      return item.title === taskInfos.title
+        ? { ...item, subtasks: changeStatus(isChecked, taskInfos.title) }
+        : item;
+    });
+
+    const columns = boardListsArr.map((listItem) => {
+      return listItem.name === taskInfos.status
+        ? { ...listItem, tasks: boardListTasks }
+        : listItem;
+    });
+
+    const { error } = await supabase
+      .from("KanbanApp-Boards")
+      .update({ columns: columns })
+      .eq("id", boardID);
   };
 
   const fetchSelectedBoard = async () => {
@@ -77,8 +100,6 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       .from("KanbanApp-Boards")
       .select()
       .eq("id", boardID);
-    console.log(data);
-    console.log(supaInfo[0].columns);
 
     let newArr = supaInfo[0].columns.map((item: any) => {
       return item.name === "Todo" ||
@@ -123,8 +144,6 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
       .select("columns")
       .eq("id", boardID);
 
-    console.log(data[0].columns);
-
     const listName = data[0].columns.filter((item: any) => {
       return item.name === taskInfos.status;
     });
@@ -137,7 +156,6 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
     const newArr = deletingTask[0].tasks.filter((item: any) => {
       return item.title !== titleName;
     });
-    console.log(newArr);
 
     const finalArray = data[0].columns.map((list: any) => {
       if (list.name === taskInfos.status) {
@@ -198,9 +216,9 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
           return !isEditable ? (
             <li className="flex gap-4 bg-[#21212d] px-4 py-3 text-white rounded">
               <input
-                onChange={handleSubtask}
+                onChange={(e) => handleSubtask(e, subtask.title)}
                 type="checkbox"
-                checked={subtask.isCompleted}
+                defaultChecked={subtask.isCompleted}
                 name={subtask.title}
               ></input>
               <p
@@ -231,6 +249,15 @@ function TaskInfoModal({ taskInfos, setEditTask }: any) {
             </li>
           );
         })}
+        {taskInfos.subtasks.length > 0 && (
+          <button
+            type="button"
+            className="bg-green-300 flex justify-start px-5"
+            onClick={() => confirm(taskInfos.title)}
+          >
+            Confirm
+          </button>
+        )}
       </ul>
       {/* status */}
       <label htmlFor="status">Status</label>

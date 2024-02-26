@@ -8,6 +8,7 @@ import fetchData from "../../FetchFunctions/FetchData.js";
 import { useQuery } from "@tanstack/react-query";
 import AddTask from "../AddTask/AddTask.js";
 import useBoardStore from "../../store/board.js";
+import supabase from "../../config/supabaseClient";
 
 type BoardType = {
   id: string;
@@ -22,6 +23,8 @@ function Header() {
   // Local states useState
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState<boolean>(false);
+  const [isAddBoardOpen, setIsAddBoardOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["boards"],
@@ -29,10 +32,8 @@ function Header() {
   });
 
   useEffect(() => {
-    if (data) {
-      // console.log(data);
-    }
-  }, []);
+    console.log(inputValue);
+  }, [inputValue]);
 
   const handleSelectedBoard = (board) => {
     setBoardID(board.id);
@@ -40,6 +41,18 @@ function Header() {
 
     // Close the modal after select a BOARD
     setIsModalOpen(!isModalOpen);
+  };
+
+  const insertBoardToSupabase = async (param) => {
+    const columnsObj = [
+      { name: "Todo", tasks: [] },
+      { name: "Doing", tasks: [] },
+      { name: "Done", tasks: [] },
+    ];
+
+    const { error } = await supabase
+      .from("KanbanApp-Boards")
+      .insert({ name: param, columns: columnsObj });
   };
 
   useEffect(() => {
@@ -91,6 +104,30 @@ function Header() {
                   </li>
                 );
               })}
+              <div className="flex flex-col gap-2 items-center">
+                <button
+                  className="justify-center text-white bg-[#2c2c38] rounded w-1/2 m-auto text-center font-bold focus:scale-110"
+                  onClick={() => setIsAddBoardOpen((prev) => !prev)}
+                >
+                  Add new Board +
+                </button>
+                {isAddBoardOpen && (
+                  <div>
+                    <input
+                      type="text"
+                      className="outline-none p-1"
+                      placeholder="Insert a Board name"
+                      onChange={(e) => setInputValue(e.target.value)}
+                    ></input>
+                    <button
+                      type="button"
+                      onClick={() => insertBoardToSupabase(inputValue)}
+                    >
+                      +
+                    </button>
+                  </div>
+                )}
+              </div>
             </ul>
           </div>
         )}
